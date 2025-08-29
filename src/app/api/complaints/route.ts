@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     // Send verification email
     try {
-      await sendVerificationEmail(email, verifyToken)
+      await sendVerificationEmail(email, verifyToken, complaint.id)
     } catch (emailError) {
       console.error('Failed to send verification email:', emailError)
       // Still create the complaint even if email fails
