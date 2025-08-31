@@ -65,7 +65,8 @@ async function logStatusChange(
 }
 
 export async function sendVerificationEmail(email: string, token: string, complaintId: string) {
-  const verificationUrl = `${process.env.APP_BASE_URL}/complaint/verify?token=${token}`
+  const baseUrl = process.env.APP_BASE_URL || 'https://complaint-page-sterling-mutuals-2sk.vercel.app'
+  const verificationUrl = `${baseUrl}/complaint/verify?token=${token}`
   const fromEmail = process.env.EMAIL_FROM_NO_REPLY || 'complaintssterling@gmail.com'
   const subject = 'Sterling Mutuals Inc. - Complaint Verification Required'
   
@@ -127,7 +128,7 @@ export async function sendVerificationEmail(email: string, token: string, compla
 
 export async function sendInternalEmail(complaint: any) {
   const fromEmail = process.env.EMAIL_FROM_NO_REPLY || 'complaintssterling@gmail.com'
-  const toEmail = process.env.EMAIL_TO_INTERNAL || 'complaints@sterlingmutuals.com'
+  const toEmail = process.env.EMAIL_TO_INTERNAL || 'complaintssterling@gmail.com'
   const subject = `Sterling Mutuals - New Complaint - ${complaint.ticketNumber}`
   
   const htmlBody = `
