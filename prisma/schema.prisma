@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -44,7 +44,7 @@ model Email {
   toEmail       String
   fromEmail     String
   subject       String
-  body          String
+  body          String      @db.Text
   status        String      @default("PENDING") // PENDING, SENT, FAILED, BOUNCED
   sentAt        DateTime?
   errorMessage  String?
