@@ -4,15 +4,25 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-// Emergency fallback for environment variables
-const databaseUrl = process.env.DATABASE_URL || 
-  process.env.POSTGRES_URL || 
-  'postgresql://postgres:NelsonCheng%23123@db.qnbqiljzyjcosfmumbqz.supabase.co:5432/postgres'
+// Build database URL with proper encoding
+function buildDatabaseUrl(): string {
+  if (process.env.DATABASE_URL) return process.env.DATABASE_URL
+  if (process.env.POSTGRES_URL) return process.env.POSTGRES_URL
+  
+  // Fallback: build URL with properly encoded password
+  const host = 'db.qnbqiljzyjcosfmumbqz.supabase.co'
+  const port = '5432'
+  const database = 'postgres'
+  const username = 'postgres'
+  const password = encodeURIComponent('NelsonCheng#123') // Properly encode the password
+  
+  return `postgresql://${username}:${password}@${host}:${port}/${database}`
+}
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({
   datasources: {
     db: {
-      url: databaseUrl
+      url: buildDatabaseUrl()
     }
   }
 })
