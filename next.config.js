@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Removed deprecated appDir option
+  experimental: {
+    outputFileTracingRoot: undefined,
+  },
+  trailingSlash: false,
+  output: undefined, // Ensure we're not in export mode
 }
 
 module.exports = nextConfig
