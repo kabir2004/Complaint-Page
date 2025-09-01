@@ -1,7 +1,4 @@
-// Re-export Supabase email functions
-export {
-  sendVerificationEmail,
-  sendInternalEmail,
-  sendAcknowledgementEmail,
-  logStatusChange
-} from './email-supabase'
+// Simple email logging function for development
+export function logEmail(type: string, to: string, subject: string) {
+  console.log(`📧 ${type}: ${to} - ${subject}`)
+}
