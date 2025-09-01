@@ -1,22 +1,18 @@
-'use client'
-
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-
 export default function Home() {
-  const router = useRouter()
-  
-  useEffect(() => {
-    router.push('/complaint')
-  }, [router])
-
   return (
     <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="text-center">
         <div className="w-64 h-40 rounded-lg flex items-center justify-center overflow-hidden mx-auto mb-4">
           <img src="/Logo EPS.png" alt="Company Logo" className="w-full h-full object-contain" />
         </div>
-        <p className="text-slate-600">Redirecting to complaint form...</p>
+        <h1 className="text-3xl font-bold text-slate-800 mb-4">Sterling Mutuals Inc.</h1>
+        <p className="text-slate-600 mb-8">Complaint Management System</p>
+        <a 
+          href="/complaint" 
+          className="bg-red-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+        >
+          Submit a Complaint
+        </a>
       </div>
     </div>
   )
