@@ -55,7 +55,7 @@ export default function ComplaintForm() {
     setError('')
 
     try {
-      const response = await fetch('/api/complaints', {
+      const response = await fetch('/api/complaint-simple', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -64,6 +64,9 @@ export default function ComplaintForm() {
       })
 
       if (response.ok) {
+        const data = await response.json()
+        // Store ticket number for success page
+        localStorage.setItem('ticketNumber', data.ticketNumber)
         router.push('/complaint/success')
       } else {
         const data = await response.json()

@@ -1,6 +1,18 @@
+'use client'
+
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 export default function SuccessPage() {
+  const [ticketNumber, setTicketNumber] = useState('')
+
+  useEffect(() => {
+    const ticket = localStorage.getItem('ticketNumber')
+    if (ticket) {
+      setTicketNumber(ticket)
+      localStorage.removeItem('ticketNumber') // Clean up
+    }
+  }, [])
   return (
     <div className="min-h-screen bg-white">
       {/* Sterling Mutuals Header */}
@@ -35,15 +47,34 @@ export default function SuccessPage() {
                 Thank you for bringing your concerns to Sterling Mutuals Inc. We have received your complaint and will begin processing it immediately according to our established procedures.
               </p>
               
+              {ticketNumber && (
+                <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center space-x-2 mb-3">
+                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-sm font-semibold text-blue-700">Your Ticket Number</span>
+                    </div>
+                    <div className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-mono text-lg font-bold tracking-wider">
+                      {ticketNumber}
+                    </div>
+                    <p className="text-blue-600 text-sm mt-2">
+                      Please save this number for your records. You can reference this ticket number in any future communications.
+                    </p>
+                  </div>
+                </div>
+              )}
+              
               <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
                 <div className="flex items-center justify-center space-x-2 mb-3">
                   <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
-                  <span className="text-sm font-semibold text-slate-700">Verification Email Sent</span>
+                  <span className="text-sm font-semibold text-slate-700">Complaint Submitted Successfully</span>
                 </div>
                 <p className="text-slate-600 text-sm">
-                  We've sent a verification email to your inbox. Please check your email and click the verification link to complete your complaint submission and begin our investigation process.
+                  Your complaint has been submitted and our Compliance team has been notified. You will receive email updates on your complaint status.
                 </p>
               </div>
             </div>
