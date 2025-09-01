@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Complaint {
+  id                    String    @id @default(cuid())
+  name                  String
+  email                 String
+  phone                 String?
+  advisorName           String
+  accountNumbers        String
+  body                  String
+  supportingDocs        String?
+  status                String    @default("PENDING") // PENDING, SUBMITTED, UNDER_INVESTIGATION, RESOLVED, CLOSED
+  ticketNumber          String?   @unique
+  verifyToken           String    @unique
+  verifyExp             DateTime
+  verificationEmailSent Boolean   @default(false)
+  verifiedAt            DateTime?
+  acknowledgementSent   Boolean   @default(false)
+  internalEmailSent     Boolean   @default(false)
+  lastStatusUpdate      DateTime?
+  assignedTo            String? // Staff member assigned to handle the complaint
+  priority              String    @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  resolutionNotes       String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  // Related models
+  emails        Email[]
+  statusHistory ComplaintStatusHistory[]
+}
+
+model Email {
+  id           String    @id @default(cuid())
+  complaintId  String
+  complaint    Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  type         String // VERIFICATION, ACKNOWLEDGEMENT, INTERNAL, STATUS_UPDATE, RESOLUTION
+  toEmail      String
+  fromEmail    String
+  subject      String
+  body         String    @db.Text
+  status       String    @default("PENDING") // PENDING, SENT, FAILED, BOUNCED
+  sentAt       DateTime?
+  errorMessage String?
+  createdAt    DateTime  @default(now())
+}
+
+model ComplaintStatusHistory {
+  id          String    @id @default(cuid())
+  complaintId String
+  complaint   Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  oldStatus   String?
+  newStatus   String
+  changedBy   String? // Staff member who made the change
+  notes       String?
+  createdAt   DateTime  @default(now())
+}

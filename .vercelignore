@@ -1,0 +1,10 @@
+# Exclude Supabase Edge Functions from Vercel build
+supabase/
+
+# Exclude other non-essential files for deployment
+*.md
+env-setup.md
+gmail-setup-guide.md
+get-supabase-keys.md
+supabase-email-setup.md
+complaint-mvp/
