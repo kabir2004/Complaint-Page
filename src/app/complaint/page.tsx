@@ -64,32 +64,16 @@ export default function ComplaintForm() {
       return
     }
 
-    try {
-      const response = await fetch('/api/complaint-simple', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          captchaVerified: isCaptchaVerified
-        }),
-      })
+    // Simulate form submission delay
+    await new Promise(resolve => setTimeout(resolve, 1000))
 
-      if (response.ok) {
-        const data = await response.json()
-        // Store ticket number for success page
-        localStorage.setItem('ticketNumber', data.ticketNumber)
-        router.push('/complaint/success')
-      } else {
-        const data = await response.json()
-        setError(data.error || 'Something went wrong')
-      }
-    } catch (err) {
-      setError('Network error. Please try again.')
-    } finally {
-      setIsSubmitting(false)
-    }
+    // Generate mock ticket number
+    const randomNum = Math.floor(Math.random() * 900000) + 100000
+    const ticketNumber = 'TKT-' + randomNum
+
+    // Store ticket number for success page
+    localStorage.setItem('ticketNumber', ticketNumber)
+    router.push('/complaint/success')
   }
 
   return (
