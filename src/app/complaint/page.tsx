@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Captcha from '../../components/Captcha'
 
 export default function ComplaintForm() {
   const [formData, setFormData] = useState({
@@ -9,7 +10,6 @@ export default function ComplaintForm() {
     email: '',
     phone: '',
     advisorName: '',
-    accountNumbers: '',
     body: '',
     supportingDocs: ''
   })
@@ -17,6 +17,8 @@ export default function ComplaintForm() {
   const [isDragOver, setIsDragOver] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [isCaptchaVerified, setIsCaptchaVerified] = useState(false)
+  const [captchaError, setCaptchaError] = useState('')
   const router = useRouter()
 
   const handleFileUpload = (files: FileList) => {
@@ -53,6 +55,14 @@ export default function ComplaintForm() {
     e.preventDefault()
     setIsSubmitting(true)
     setError('')
+    setCaptchaError('')
+
+    // Check CAPTCHA verification
+    if (!isCaptchaVerified) {
+      setCaptchaError('Please complete the security verification to submit your complaint.')
+      setIsSubmitting(false)
+      return
+    }
 
     try {
       const response = await fetch('/api/complaint-simple', {
@@ -60,7 +70,10 @@ export default function ComplaintForm() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          captchaVerified: isCaptchaVerified
+        }),
       })
 
       if (response.ok) {
@@ -83,7 +96,7 @@ export default function ComplaintForm() {
     <div className="min-h-screen bg-white">
       {/* Sterling Mutuals Header */}
       <header className="relative z-10 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-center">
             <div className="flex items-center justify-center">
               <div className="w-64 h-40 rounded-lg flex items-center justify-center overflow-hidden">
@@ -95,12 +108,12 @@ export default function ComplaintForm() {
       </header>
 
       {/* Main Content */}
-      <main className="relative z-0 py-16">
+      <main className="relative z-0 py-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Page Header */}
-          <div className="text-center mb-12">
-            <h1 className="section-title mb-4">Submit Your Complaint</h1>
-            <p className="section-subtitle max-w-3xl mx-auto">
+          <div className="text-center mb-16">
+            <h1 className="section-title mb-6">Submit Your Complaint</h1>
+            <p className="section-subtitle max-w-3xl mx-auto leading-relaxed">
               Sterling Mutuals Inc. takes client complaints very seriously. We have developed detailed complaint procedures to address your concerns in a timely manner. Your complaint will be thoroughly investigated by our Compliance team.
             </p>
           </div>
@@ -223,37 +236,20 @@ export default function ComplaintForm() {
                 {/* Account Information Section */}
                 <div className="border-b border-slate-200 pb-6">
                   <h3 className="text-lg font-semibold text-slate-900 mb-4">Account Information</h3>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="advisorName" className="form-label">
-                        Sterling Advisor Name
-                        <span className="text-red-500 ml-1">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        id="advisorName"
-                        required
-                        value={formData.advisorName}
-                        onChange={(e) => setFormData({ ...formData, advisorName: e.target.value })}
-                        className="form-input"
-                        placeholder="Name of your Sterling Advisor"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="accountNumbers" className="form-label">
-                        Account Number(s)
-                        <span className="text-red-500 ml-1">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        id="accountNumbers"
-                        required
-                        value={formData.accountNumbers}
-                        onChange={(e) => setFormData({ ...formData, accountNumbers: e.target.value })}
-                        className="form-input"
-                        placeholder="Enter account number(s)"
-                      />
-                    </div>
+                  <div>
+                    <label htmlFor="advisorName" className="form-label">
+                      Sterling Advisor Name
+                      <span className="text-red-500 ml-1">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="advisorName"
+                      required
+                      value={formData.advisorName}
+                      onChange={(e) => setFormData({ ...formData, advisorName: e.target.value })}
+                      className="form-input"
+                      placeholder="Name of your Sterling Advisor"
+                    />
                   </div>
                 </div>
 
@@ -383,11 +379,19 @@ export default function ComplaintForm() {
                 </div>
               </div>
 
+              {/* Security Verification */}
+              <div className="border-b border-slate-200 pb-6">
+                <Captcha 
+                  onVerify={setIsCaptchaVerified} 
+                  error={captchaError}
+                />
+              </div>
+
               {/* Form Actions */}
               <div className="pt-6 border-t border-slate-200">
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !isCaptchaVerified}
                   className="w-full bg-blue-900 text-white border-2 border-blue-900 rounded-lg px-6 py-4 font-semibold text-base transition-all duration-300 ease-in-out hover:bg-white hover:text-blue-900 focus:outline-none focus:ring-4 focus:ring-blue-900/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-900 disabled:hover:text-white"
                 >
                   {isSubmitting ? (
@@ -398,6 +402,13 @@ export default function ComplaintForm() {
                       </svg>
                       Submitting...
                     </>
+                  ) : !isCaptchaVerified ? (
+                    <span className="flex items-center justify-center whitespace-nowrap">
+                      Complete Security Verification
+                      <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </span>
                   ) : (
                     <span className="flex items-center justify-center whitespace-nowrap">
                       Submit Complaint
